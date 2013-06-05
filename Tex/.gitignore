@@ -6,3 +6,5 @@
 *.synctex.gz
 *.synctex.gz(busy)
 *.toc
+*.bbl
+*.blg
