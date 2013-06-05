@@ -8,10 +8,81 @@
 
 \chapter{通用控制电路设计}
 \label{chap:electricalSystem}
+模块化机器人的各个模块都是可以独立工作的个体。从上一章的设计可知，每个模块都有一个核心板载系统来对本模块的基本功能进行控制。这一设计思路在其它模块化机器人上也有所体现。例如美国加州大学戴维斯分校的Graham G. Ryland等人\upcite{ryland2010design}设计的模块化机器人系统，每个模块是包含四个自由度的可以独立控制并运动的个体。而个体之间通过通信和协议来完成作为组合的总体所实现的功能。在本设计中，因为每个模块都有不同的功能，进行拼装后的实体的机器人通过协同来实现全部功能。为了使设计的硬件能在最大程度上实行公用，本设计将机器人电路进行拆分，并对电路实现了模块化。 \\
+每个机器人模块都将实现作为一个模块的基本功能，如实现与其他模块的通信；单独的程序上传与下载、与在线调试；对于自身模块的电源管理；与外部其他系统的通讯；简单的片上调试按钮和指示用数码管和LED。据此本方案设计了每个模块都要使用的通用模块控制电路。而对于不同模块的不同功能需求，本方案设计了大量的外设电路，每一个模块将会在功能性外设及接口设计部分进行讨论与说明。这样的好处是是每一个模块都拥有其工作所用的资源而不会有资源的浪费。例如，用于定位的IMU模块只有地盘模块需要使用。而上层实现其他功能的模块，如机械手并不需要使用，这里没有把其集成在通用板上，是极大的避免了资源的浪费。为了能够使用这些外设电路，本设计已经将片上所有资源系数引出。这样做同时还可供未来通用板的扩展。 \\
+一下各小结、节将对整个机器人系统的电路系统进行详细阐述。 \\
 \section{通用模块控制电路}
+通用电路板本着简单，稳定，可以快速开发和方便部署的原则进行了设计。控制芯片选用了引脚众多，功能强大和文档完善的Freescale公司的MC9S12XS128单片机。本设计使用的是拥有112个引脚的版本。这款芯片的特点是低功耗、高集成、易于扩展，自带看门狗计数器、PWM输出、增强型捕捉定时器\upcite{xn2012baseon}。在本设计中，将通用控制电路板分为两个部分，一个部分是包含BWM程序烧写在线调试器，复位按键和单片机芯片的最小系统；另一部分是提供通用电路功能的接口板。这样设计而不是直接将单片机焊接在接口板上的原因是，一旦单片机烧毁，可以同过更换最小系统来是电路板恢复使用，而不用丢弃整个电路板，基板上昂贵芯片。 \\
+下面的部分将对这两个模块进行详细的介绍。 \\
+\subsection{最小系统}
+最小系统的电路图如图\ref{fig.CoreSch} 所示。最小系统实物图如图\ref{fig.CorePhoto} 所示。 \\
+\begin{figure}[!htp]\label{fig.CorePhoto}
+  \centering
+  \includegraphics{chap3/coreminsys.eps}
+  \bicaption{最小系统实物图}{最小系统实物图}{Fig}{the Minimal Core System}
+\end{figure}
+\begin{figure}[!htp]\label{fig.CoreSch}
+  \centering
+  \bicaption{最小系统电路图}{最小系统电路图}{Fig}{Schematic of the Minimal Core System}
+  \includegraphics[angle=-90,width=1.3\textwidth]{chap3/Core112V2.pdf}
+\end{figure}
+\\
+这块最小系统板上有一个16MHz的晶振连接至芯片。芯片正常工作时的频率是由锁相环（PLL）超频到40MHz的。这块最小系统还有一个复位键，引入芯片RESET引脚，将检测电路的下降沿进行复位。同时最小系统上海提供一个BWM程序上传和下载及在线调试模块。片上提供128k片上RAM，可以用来储存芯片执行用程序。还有一个独立的电源管理模块，以提供稳定的5v电压给单片机工作。之所以称为最小系统，就是因为以上是这块芯片的全部功能元件。如原理图所示，这块最小系统的其他功能就是简单的将单片机所有引脚引出。 \\
+\subsection{功能接口板}
+功能接口板是通用模块控制电路的核心部分。它具有承上启下的作用，得到最小系统引出的单片机全部空余引脚，并对其功能进行设计。其电路图如图\ref{fig.BaseSch} 所示。 其共分为电源管理，CAN总线，单片机接口，电压测试单元，串口通讯，数码管显示单元，LED及案件阵列和引出接口几部分。 \\
+\begin{figure}[!htp]\label{fig.BaseSch}
+  \centering
+  \bicaption{功能接口板电路图}{功能接口板电路图}{Fig}{Schematic of Base Board}
+  \includegraphics[angle=-90,width=0.8\textwidth]{chap3/CoreBoardSchematic.PNG}
+\end{figure}
+\\
+其中电源管理部分的电路如图\ref{fig.BaseScrMg}。使用两片1117输出两个5v电压，为了使电流相差较大模块之间不会相互干扰。其中一个给单片机及通讯模块供压，电流小，对电流稳定性要求高；而另一路主要给外设电路供压。 \\
+\begin{figure}[!htp]\label{fig.BaseScrMg}
+  \centering
+  \includegraphics[width=0.8\textwidth]{chap3/CoreBoardPowerMg.PNG}
+  \bicaption{电源管理电路原理图}{电源管理电路原理图}{Fig}{Schematic of Power Source Management Unit}
+\end{figure}
+\\
+CAN总线电路图如图所示\ref{fig.BaseCAN} 。用一块Microchip公司生产的MCP2511作为单片机内置CAN模块的Transceiver，将CAN端口数据打包编码后传输到总线中去。前面已经介绍过了这款机器人将打破传统的接触式传输连线，而是使用光学方法进行数据传输，其中这里CAN中线的输出口，就是要连接到光学传输接口板上。\\
+\begin{figure}[!htp]\label{fig.BaseCAN}
+  \centering
+  \includegraphics[width=0.8\textwidth]{chap3/CoreBoardCANBus.PNG}
+  \bicaption{CAN电路原理图}{CAN电路原理图}{Fig}{Schematic of CAN Bus Unit}
+\end{figure}
+\\
+CAN总线2.0协议\upcite{bosch1991can}是由博世公司提出被提供支持的。因为其两线制的机制，和可以同时连接非常多个模块，并能组织各个节点模块共同工作的特点二大量应用在汽车领域。其传输速度快，稳定性强的特点也为其能轻松移植到机器人系统中来提供了可行性。相对较少的接线同时也意味着极大的容错率，这就是本设计选择CAN总线最为模块间传输工具的原因。这一设计的灵感来源于Ying Zhang等人\upcite{zhang2002massively}的研究。\\
+功能接口板的PCB设计图如图\ref{fig.CorePCB} 所示。其虚拟实物图如图\ref{fig.CoreReal} 所示，3D立体仿真图如图\ref{fig.Core3D} 所示。 \\
+\begin{figure}\label{fig.CorePCB}
+  \centering
+  \subfigure[PCB正面]{
+    \label{fig:corepcb:a} %% label for first subfigure
+    \includegraphics[width=0.35\textwidth]{chap3/CoreBoardTop.PNG}}
+  \hspace{1in}
+  \subfigure[PCB背面]{
+    \label{fig:corepcb:b} %% label for second subfigure
+    \includegraphics[width=0.35\textwidth]{chap3/CoreBoardBottom.PNG}}
+  \bicaption{功能接口板的设计PCB样图}{功能接口板的设计PCB样图}{Fig}{The PCB View of Main Base Board}
+\end{figure}
+\begin{figure}\label{fig.CoreReal}
+  \centering
+  \subfigure[PCB正面]{
+    \label{fig:corereal:a} %% label for first subfigure
+    \includegraphics[width=0.35\textwidth]{chap3/CoreBoardManTop.PNG}}
+  \hspace{1in}
+  \subfigure[PCB背面]{
+    \label{fig:corereal:b} %% label for second subfigure
+    \includegraphics[width=0.35\textwidth]{chap3/CoreBoardManBottom.PNG}}
+  \bicaption{功能接口板的虚拟实物图}{功能接口板的虚拟实物图}{Fig}{The Virtual View of Main Base Board}
+\end{figure}
+\begin{figure}[!htp]\label{fig.Core3D}
+  \centering
+  \includegraphics[width=0.8\textwidth]{chap3/CoreBoard3D.PNG}
+  \bicaption{功能接口板的虚拟实物图3D}{功能接口板的虚拟实物图3D}{Fig}{The 3D Virtual View of Main Base Board}
+\end{figure}
 \section{功能型外设及接口设计}
-\subsection{无线通讯模块}
+功能性外设主要提供某个模块所需要的独特功能。这些模块可能包括机器人应用中的方方面面。如无线通讯模块：用来是摸个机器人模块与外部设备，如远程计算通讯，从而实现信息的沟通或是机器人于远程系统的交互；舵机驱动模块：可以用来驱动具有多舵机结构的机械臂或其他的多舵机应用模块；IMU和GPS模块：用来实现定位，机器人姿态探测等功能；电机驱动模块，用来驱动电机，可以用在轮式底盘或是履带式底盘的驱动；编码器模块：可以用来对固定于某一电机或伺服电机舵机上的编码器进行驱动与计数；传感器模块：用来驱动传感器来对外部信息进行采集和处理；以及其他应用领域的模块等等。本设计因为只对移动平台进行了设计及研究，所以只具体设计了IMU模块，电机驱动模块，编码器模块，传感器模块和光电CAN传输模块。对于每一个模块的详细设计如下。\\
 \subsection{IMU模块}
+
 \subsection{驱动模块}
 \subsection{编码器模块}
 \subsection{传感器模块}
