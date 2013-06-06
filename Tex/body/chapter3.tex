@@ -178,5 +178,35 @@ IMU是Inertial measurement unit（惯性测量单元）的缩写。本方案所�
   \bicaption{超声波传感器}{超声波传感器}{Fig}{Ultrasonics Sensor Unit}
 \end{figure}
 \subsection{模块间通讯接口}
-\section{本章小结}
+模块间通讯接口是本设计中很重要的一部分，也是本设计的一个创新点。在Ying Zhang\upcite{zhang2002massively} 的关于模块化机器人的大规模控制网络系统设计中,提供了使用CAN总线的模块化机器人网络进行控制的很好的解决方案。这套方案给出了一个在软件层面上可行的方法，受此启发，本设计将整个模块化机器人的相互通讯架构在CAN总线上。在前面的机械设计部分，对于为何使用光学式通道连接代替机械式触点连接给出了充分的解释。而在本章这是在电路硬件层面上将其实现。
 
+对于CAN总线的每一条输出线都采用一对红外线光电对管来发送和接受相应线中的内容。CANH中是以2.5V为基电位的脉冲信号，最大幅值为5v；而CANL中是以0V为基电位的脉冲信号，最大幅值为2.5V。根据其这一特点，分别设计了CANH和CANL的发送单元。对于CANH是先将信号通过减法器，减去一个2.5V的参考电压，在输出到一个MOSFET的G极，来控制红外LED的开关，来达到把信号发出的目的。CANL则可以直接减引脚接入MOSFET的G极来控制红外LED的亮灭。CANH和CANL的接收单元也不相同。因为接收到的光敏二极管的输出电压为一模拟值，所以要通过一定的方法把其变为数字值。对于CANH，输出电压先经过一个比较器，变为基值是0v，幅值是5V的脉冲信号，再通过加法器加上一个2.5V的参考电压，来变成基值为2.5V，最大幅值为5V的脉冲信号，并输出回CANH线。对于CANL线，情况相似，也是要先要经过一个比较器，在对脉冲信号进行调幅。这一模块的原理图如图所示，PCB设计样图如图所示，虚拟实物图如图所示。
+\begin{figure}[!htp]\label{fig.CANPSch}
+  \centering
+  \includegraphics[angle=-90,width=0.8\textwidth]{chap3/CANCommunication.PNG}
+  \bicaption{模块间通讯接口板电路原理图}{模块间通讯接口板电路原理图}{Fig}{Schematic of Modular Level Communication Unit}
+\end{figure}
+\begin{figure}\label{fig.CANPPCB}
+  \centering
+  \subfigure[PCB正面]{
+    \label{fig:corepcb:a} %% label for first subfigure
+    \includegraphics[width=0.35\textwidth]{chap3/CANportalTop.PNG}}
+  \hspace{1in}
+  \subfigure[PCB背面]{
+    \label{fig:corepcb:b} %% label for second subfigure
+    \includegraphics[width=0.35\textwidth]{chap3/CANportalBottom.PNG}}
+  \bicaption{模块间通讯接口板设计PCB样图}{模块间通讯接口板设计PCB样图}{Fig}{The PCB View of Modular Level Communication Unit}
+\end{figure}
+\begin{figure}\label{fig.CANPReal}
+  \centering
+  \subfigure[PCB正面]{
+    \label{fig:corereal:a} %% label for first subfigure
+    \includegraphics[width=0.35\textwidth]{chap3/CANRealTop.PNG}}
+  \hspace{1in}
+  \subfigure[PCB背面]{
+    \label{fig:corereal:b} %% label for second subfigure
+    \includegraphics[width=0.35\textwidth]{chap3/CANRealBttom.PNG}}
+  \bicaption{模块间通讯接口板虚拟实物图}{模块间通讯接口板虚拟实物图}{Fig}{The Virtual View of Modular Level Communication Unit}
+\end{figure}
+\section{本章小结}
+本章对多功能模块化机器人的控制系统的电路系统部分的设计进行了详尽的说明。对于每个模块化机器人来说，其电路系统分为两个部分，一个是通用模块控制电路，一个是外设功能电路。通用控制电路实现模块化机器人每个模块的基本功能，并提供足够的扩展接口；外设功能电路是帮助模块使某一功能具体实现的电路。不同的模块可以选择需要的外设功能，以在实现期望功能的前提下，减少资源的浪费。
