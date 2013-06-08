@@ -26,8 +26,74 @@ V_{supply} = K_{e}\dot{\theta}
 \end{equation}
 可知电机转速和输入电压$V_{sipply}$成正比，这就意味轮子的转速与方波占空比成正比。所以控制轮子的转速只需要改变输入方波的占空比就可以了。但是占空比只给出了一个速度的相对关系，并没有与具体速度值的对应，所以控制的时候还要通过传感器的数据，对速度控制进行闭环。
 
-电机系统所需输出口初始化，和一般电机控制程序如下。
+电机系统所需输出口初始化，和一般电机控制程序如下。此段程序，是参考罗翔的程序所撰写。
+\begin{lstlisting}[language={C}, caption={针对BTS7960的单片机初始化程序}]
+#include "BTS7960B.h"
+#include "SystemConfig.h"
 
+/* Crystal's frequecy is 40MHz
+   USE PPL change the bus frequecy*/
+//---------宏参数定义-------------
+#define HIGH   1
+#define LOW    0
+#define OUTPUT 1
+#define INPUT  0
+
+#define SETPWM23 0x0C                    //置1 PWM23选择项
+#define CLRPWM23 (~SETPWM23)             //清零PWM23选择项
+#define CLKB1D08 0x30                    //ClockB运行方式
+
+#if SYS_BUS_FREQUENCY == SYSTEM_BUS_64M 
+//64M-预分频: fA=2M, fB=4M(使用fB)    
+    #define _PWMMAX 199                      //占空比最大值
+    #define _PWMMIN 0                        //占空比最小值
+    #define _PWMUNT 2    
+#else                   
+//其他分频: fA = 2.5MHz, fB = 5MHz,请在此基础上设定频率 
+    #define _PWMMAX 249                      //占空比最大值
+    #define _PWMMIN 0                        //占空比最小值 
+    #define _PWMUNT 5/2   
+#endif   
+
+//---------操作函数定义-------------
+void BTS7960BRestart(void)     
+//重启函数：对需使用I/O口初始化
+{
+    DDRM_DDRM5 = OUTPUT;
+    _BTSDRVE   = LOW   ;
+    DDRM_DDRM4 = INPUT ;
+    _BTSDRVS   = LOW   ;//Initial BITS OF PTM PORT 
+    
+    PWME     &= CLRPWM23;//关PWM23 
+    
+    //PWMPRCLK |= CLKB1D08;//ClockB frequency = 40MHz/8=5MHz
+    //PWMSCLB   = 5       ;
+    
+    PWMPER2   = _PWMMAX ;//PWM2 frequency = 10kHz
+    PWMDTY2   = _PWMMAX ;//占空比0 
+    PWMPER3   = _PWMMAX ;//PWM3 frequency = 10kHz
+    PWMDTY3   = _PWMMAX ;//占空比0    
+    
+    PWME     |= SETPWM23;
+    
+    BTS7960BEnable(HIGH) ;   
+}
+
+unsigned char BTS7960BControl(unsigned char ForwardPWM, unsigned char BackwardPWM)
+//控制函数：正反转控制。输入PWM占空比，输出正反转状态 (输入均为百分之)
+{
+    unsigned char PStatus = BTS7960STOP;
+    //PWM状态赋值
+    PStatus = (ForwardPWM  > BackwardPWM)?BTS7960FORWARD:BTS7960BACKWARD;//电机运行状态判断
+    PStatus = (ForwardPWM == BackwardPWM)?BTS7960STOP   :PStatus        ;
+    
+    ForwardPWM  = (ForwardPWM  > 100)?100:ForwardPWM ;
+    BackwardPWM = (BackwardPWM > 100)?100:BackwardPWM;
+    PWMDTY2 = (byte)((_PWMMAX < ForwardPWM  * _PWMUNT)?_PWMMIN:(_PWMMAX - ForwardPWM *_PWMUNT));//计算PWM占空比
+    PWMDTY3 = (byte)((_PWMMAX < BackwardPWM * _PWMUNT)?_PWMMIN:(_PWMMAX - BackwardPWM*_PWMUNT));
+    return PStatus;
+}              
+\end{lstlisting}
 在底盘模块正常情况下是沿着算法所确定的方向匀速行进，速度只需规定一个为常数的占空比值就可以了。但是因为电机特性不一致的原因，即便规定同一PWM值，车体行进方向仍然可能偏离既定方向，所以要使底盘保持行进方向，就要对其行进角度进行闭环。这一功能的可以通过电子罗盘返回的数据来设计实现。这里将采用传统的PID算法来进行闭环程序的设计。PID系统的传递方程为的拉普拉斯形式可以写为 \\
 \begin{equation}
 G(s)= K_p+\frac{K_i}{s}+K_ds
@@ -164,6 +230,47 @@ void Kalman_Filter(float angle_m,float gyro_m)
 \subsection{GPS定位}
 因为GPS极差的室内信号的接收率，所以在本设计中并没有使用这一模块，不过作为常见的定位手段，在这里予以进行简单讨论。GPS模块往往为串口输出，输出遵从GPS标准协议，刷新频率为1Hz，即一秒输出一次。在本实验中这个输出频率显然太慢了。不过作为GPS模块，它会直接输出对象目标和运动方向角度。直接得到这些数据，是可以加快计算速度的，同时也使算法设计变得简单。不过GPS的另一个去点就是，民用级别的模块的精度极低，大概为5m，在地势复杂多变的环境中应用显然是不现实的。所以GPS模块更适合于户外开阔地势的定位使用。
 \section{未知环境避障算法}
+在本设计中采用了虚拟势能场的算法来实现路径计算和自动蔽障的。这一算法最先由Khatib \upcite{khatib1986real}提出，并应用于机械臂行进路线的规划。后来虚拟势场的概念经由Yoram Koren等人\upcite{koren1991potential} 的发展，而可以应用到平面移动物体的二维运动规划中。
 
+基本的虚拟势场思想主要是引入了两个虚拟力。一个为虚拟引力，一个为虚拟斥力。虚拟引力是指运动体与目标点之间的力，虚拟斥力是指运动体与障碍物之间的力。目标点在全局坐标系中的位置是已知的，所以在初始状态下就存在着引力场的作用，是机器人向目标点运动。因为势能的等势线为圆形，所以只有运动物体向着目标点前进，才是是能变化梯度最大方向。因此在某种意义上讲，由虚拟引力所计算出的运动方向是最优的。在本设计中，设计的机器人所处的环境是未知的，就是说初始条件下并无障碍物的存在，而在运动过程中会遇到障碍物，并在障碍物的斥力影响下而改变运动方向。这说明斥力是一种短程力，它的作用范围是有限的。
+
+在本设计中接纳了耿兆丰等人\upcite{gzf1992VPpath} 的方案,将目标点产生的势场$P$定义为 \\
+\begin{equation}
+P = r^2/2 = [(x-x_t)^2+(y-y_t)^2]/2
+\end{equation}
+其中$x_t$,$y_t$为目标点坐标。则此时机器人所处位置的势场梯度可以表示为 \\
+\begin{equation}
+\nabla P = \frac{\partial P}{\partial x}i+\frac{\partial P}{\partial y}j = (x-x_t)i+(y-y_t)
+\end{equation}
+因此引力可以表示为 \\
+\begin{equation}
+F_{att} = K(|\nabla P|_{r=d})=Kd
+\end{equation}
+其中$K$为引力常数。
+
+对于斥力，正如上文所说，为短程力，所以其应该具有随着距离的变长而减弱的特点，如果斥力能与距离成反比的话，这符合这一要求。所以斥力的形式应为 \\
+\begin{equation}
+F_{rep} = \frac{K_r}{(x-x_o)^2+(y-y_o)^2}
+\end{equation}
+其中$K_r$为斥力常数，$x_o$,$y_o$为障碍物的坐标。在此处分母使用距离的平方是因为，第一可以简化计算，提高计算速度；第二可以加快斥力的衰减和增加。斥力的作用方向即为力场梯度方向。 \\
+\begin{equation}
+\nabla F_{rep} = -2\frac{K_r(x-x_o)}{((x-x_o)^2+(y-y_o)^2)^2}i-2\frac{K_r(y-y_o)}{((x-x_o)^2+(y-y_o)^2)^2}j
+\end{equation}
+其方向矢量可以化简的表示为$[-(x-x_o)\; -(y-y_o)]$ 。因为斥力是个短程力，所以要设定一个阀值，在是斥力小于这一阀值时为0。
+
+在有了引力与斥力的公式后，就可以对每个点对车体的作用积分而算出合力，再通过合力的方向来计算机器人的行动方向。本机器人的控制系统所有的方向都表示为机器人前进方向与世界坐标系的y轴的夹角。算法的示意图如图\upcite{fig.pathPlaning1}所示。
+\begin{figure}[!htp]
+  \centering
+  \includegraphics[width=0.5\textwidth]{chap4/pathPlaning1.PNG}
+  \bicaption[fig.pathPlaning1]{虚拟势能蔽障算法示意图}{虚拟势能蔽障算法示意图\upcite{koren1991potential}}{Fig}{Motion of a mobile robot applying a potential field algorithm}
+\end{figure}
+但是这种算法存在着问题的。问题就是，如果障碍物足够大，可能存在着受力平衡点，使机器人永远无法越过障碍物。为了改变这一现象，不得不对机器人引入惯性。但是光引入惯性还是不够的，同时还要引入运动方向锁，来使最后的搜索过程可以得到收敛解。
 \section{地图生成和最优路径生成}
+关于地图的绘制，是受到了David Waller等人\upcite{waller1998transfer}研究的启发，同时参考了周斌等人\upcite{zb2006memory}的研究。底盘模块进行这样设计的原因是如果需要多次重复的使机器人从某一出发点到达某一目标点，在经过第一次机器人的探索后，可以记住环境信息，并在下次进行相同任务时，可以直接沿着最优路径前进而不需要重新探测。则可以大大加快机器人在同一环境长时间重复执行同一任务时的效率。
+
+与周斌给出的方法不同，在本设计中，地图信息并不是保存在车体的控制器里，而是底盘模块会将数据发回给上位机，并由上位机处理并绘制地图，再通过上位机来计算最优路径，返回给片上系统。地图绘制的过程主要还是靠传感器模块标出障碍物的坐标，并根据这一坐标和机器人本身坐标尺寸来绘制障碍物和机器人可通过通道。
+
+而最优路径生成这是通过现将绘制的地图网格化，然后从目标点出发向起始点回溯的去评价每一个点。评价公司就是与目标点的距离。在评价过程中只关心处在网格节点上的点，只要网格足够小，最后所得到的结果是可信的。当所有点评价完毕后，出发点会有多种评价值。找出最小的评价值，就可以找出最优的路径啦。然后连接这条线路上的每一个点，对这条路径的关键点信息进行与计算并返回给底盘模块进行存储。这样就完成了最优路径生成的过程。
+
 \section{本章小结}
+本章主要介绍了所设计的移动模块化机器人系统的软件部分。这部分内容主要是针对轮式底盘和超声波传感器部分所设计的。本章节只涉及到了本移动式模块化平台的关键算法，而比较简单的底层算法实现没有在本章进行介绍。关键算法包括4部分，第一位底盘的驱动算法，这是其他对车体控制算法的基础；其次是车体定位算法，这些算法是决定蔽障是否可行的关键；接下来是蔽障算法，详细介绍了机器人是如何能绕过障碍物而自主向目标点行进的；最后是地图的绘制和最优路径的生成，其中地图绘制是最优路径生成的基础。
