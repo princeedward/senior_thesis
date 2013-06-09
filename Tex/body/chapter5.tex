@@ -166,9 +166,12 @@
 </model>
 \end{lstlisting}
 \section{机器人所处的仿真世界的建立}
-对于算法的验证，我们只需要随机建立一个充满障碍物的世界，唯一要保证的就是从起始点到终点是有解的。所以世界建立如下\\
-%\begin{lstlisting}[language={XML}, caption={仿真世界的建立}]
-%\end{lstlisting}
+对于算法的验证，我们只需要随机建立一个充满障碍物的世界，唯一要保证的就是从起始点到终点是有解的。本设计所建立的世界如图\ref{fig.simWorld} 所示，相关代码请见附录\ref{chap:worldsdf}。
+\begin{figure}[!htp]
+  \centering
+  \includegraphics[width=0.8\textwidth]{chap5/Maze.jpg}
+  \bicaption[fig.simWorld]{仿真所建立的障碍物世界}{仿真所建立的障碍物世界}{Fig}{World in simulation}
+\end{figure}
 \section{机器人的扩展组件撰写}
 机器人的扩展组件是指机器人需要实现某一功能而需要拥有的方程文件，GAZEBO支持C++进行组件编写。在本设计中需要通过模型控制文件来实现避障算法。\\
 \begin{lstlisting}[language={C}, caption={机器人控制扩展组件}]
@@ -326,8 +329,15 @@ namespace gazebo
   GZ_REGISTER_MODEL_PLUGIN(MobileBasePlugin)
 }
 \end{lstlisting}
-\section{传感器的扩展组件}
+%\section{传感器的扩展组件}
 \section{仿真过程与算法验证}
+在不断对代码修改后，最终仿真得以实现。仿真截图如图所示。其中蓝色部分为传感器前侧所能感知到的区域，图中车体正在向障碍物间空隙前进。因为在仿真中所计算的数据量非常大，所以仿真速度相对较慢，走出迷宫大概花了25小时46分钟。不过最后小车基本顺利到达指定位置，经测试说明在上章中提出的虚拟势场算法基本可行。
+\begin{figure}[!htp]
+  \centering
+  \includegraphics[width=0.8\textwidth]{chap5/OnMoving.jpg}
+  \bicaption[fig.simOnMoving]{仿真进行示意图}{仿真进行示意图}{Fig}{The simulation is on going}
+\end{figure}
 
+仿真中存在着的问题也比较多，比如算法对于环境还是有一定的依赖性，并不能完全脱离莫一种特定的对环境的要求。所以算法还可以据此进行一些改进。但因为在本设计中使用的环境也即为复杂，而实际中的环境并没有这么复杂，所以说，算法在一般的环境中还是可以正常工作的。所以仿真基本是成功的。而对于这个机器人控制系统的设计也由此基本完成。
 \section{本章小结}
 本章中详细的介绍了仿真环境的搭建，其中包括模型的创建及生成，传感器的定义与模型体的连接，传感器的信息收集程序，模型的控制程序等。在本节中所验证的算法为上一章所介绍的改良虚拟势场方法。虚拟势场方法在二维环境中，已被多次验证，但在三维环境下被模拟比较少见，而本设计则展示了这一方法的有效性。
