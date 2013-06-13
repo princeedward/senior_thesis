@@ -7,15 +7,13 @@
 \begin{abstract}
 本文从模块化机器人与移动机器人的发展现状出发，对于新式的机器人的需求做出了合理的分析，并确定了一种将两种机器人模式进行整合的方案。其兼具有移动机器人的移动能力，同时又可根据用户对于机器人的需求而组合不同的模块以实现需求的功能的灵活性。这样一款智能多模块移动机器人符合现代工业界与特殊应用领域对于机器人的需求。
 
-在确定这款多功能模块化移动机器人的结构后，本文对于控制这一机器人的系统的设计进行了详细的分析与介绍。作为一个完整的系统，其应该包括三个层面上的设计。第一为外在的与环境交互的机器人机械结构，第二为为控制外部结构提供可能的机器人系统电路硬件， 第三为对机器人与外界交互制定规则的控制外部结构的软件。本文从每个部分所需要的功能出发，对每一个部分都的内容都进行了详细的介绍。
+在确定这款多功能模块化移动机器人的结构后，本文对于控制这一机器人的系统的设计进行了详细的分析与介绍。作为一个完整的系统，其应该包括三个层面上的设计。第一为外在的与环境交互的机器人机械结构，第二为为控制外部结构提供可能的机器人系统电路硬件， 第三为对机器人与外界交互制定规则的控制外部结构的软件。本文从每个部分所需要的功能出发，对每一个部分的内容都进行了详细的介绍。
 
-机械结构部分，提出了基于以前机器人模块设计方案的诸多改进，其中包括对于通用模块的重设计，对于传感器支架重设计，对于标准通讯接口的重设计，以及对新增加的用于辅助定位的轮式编码器的设计。在设计的说明中，本文给出了最后实现的效果图，同时本设计的尺寸都是以实际尺寸为基础的。
+机械结构部分，提出了基于以前机器人模块设计方案的诸多改进，其中包括对于通用模块的重设计，对于传感器支架重设计，对于标准通讯接口的重设计，以及对新增加的用于辅助定位的轮式编码器的设计。在设计的说明中，本文给出了最后实现的效果图。
 
-电路硬件部分，进行了多块PCB印刷板的设计。其中硬件电路主要分为两个部分，第一部分为每个模块都要使用的基本功能控制电路。其包括单片机，电源管理，模块间通讯接口。其他未使用的接口全部引出，以供外接模块使用。第二部分为外设辅助电路。其中包括实现各个具体功能的电路，如用于定位的IMU模块，用于测位移和轮速的编码器模块，用于驱动直流电机的电机驱动模块，用于驱动传感器的传感器接口模块和用于实际模块间通讯实现的模块间通讯接口模块。
+电路硬件部分，进行了多块PCB印刷板的设计。其中硬件电路主要分为两个部分，第一部分为每个模块都要使用的基本功能控制电路。其包括单片机，电源管理单元，模块间通讯接口。其他未使用的接口全部引出，以供外接模块使用。第二部分为外设辅助电路。其中包括实现各个具体功能的电路，如用于定位的IMU模块，用于测位移和轮速的编码器模块，用于驱动直流电机的电机驱动模块，用于驱动传感器的传感器接口模块和用于实际模块间通讯实现的模块间通讯接口模块。
 
-控制软件部分，对控制系统的基本软件单元进行了合理的解释与介绍。这些基本单元包括电机驱动程序，车体定位算法，未知环境蔽障算法和地图绘制与最优路径生成算法。这部分内容依赖大量的数学公式与分析过程。本设计参考了大量相关领域的研究工作，并在此基础上提出了一些新的观点，其中最重要的一点就是改进了虚拟势场算法。
-
-在三部分的设计过后，本设计对所涉及的系统在动力学仿真环境GAZEBO中进行了测试，并通过测试证明所设计的控制软件基本是有效的。关于GAZEBO内测试的具体内容在本文中进行了详细的介绍，并给出了程序源代码，帮助测试过程被更好地理解。
+控制软件部分，对控制系统的基本软件单元进行了合理的解释与介绍。这些基本单元包括电机驱动程序，车体定位算法，未知环境蔽障算法和地图绘制与最优路径生成算法。本论文提出了改进的虚拟势场算法，并在动力学仿真环境GAZEBO中实现了模块化移动机器人的运动仿真。
 
   \keywords{模块化机器人，移动机器人，模块化硬件电路，定位方案，虚拟势场，GAZEBO}
 \end{abstract}
@@ -29,9 +27,9 @@ For mechanism, the paper shows a lot of re-design of the old modular robot model
 
 For circuit, the paper provided many PCB design documents, which illustrate the final appearance of a PCB. In this part, there will be two kind of circuit being introduced.The first kind of circuit is a basic one, which contains MCU and communication unit, the other part of circuit are peripherals. The peripherals will help specific module to achieve specific functions.
 
-For control software. Most of the software in this paper are written in C, a lot of details in math will be provided. In this part, the paper also propose a new kind of path planing method which is modified virtual potential energy method. 
+For control software. Most of the software in this paper are written in C, a lot of details in math will be provided. In this part, the paper also propose a new kind of path planing method which is modified virtual potential field method. 
 
-In the last part of this paper, it shows the simulation of the robot moving in a test environment. The simulation software we used is GAZEBO. The simulation actually succeed and proofed that this kind of algorithm is applicable and valid.
+In the last part of this paper, it shows the simulation of the robot moving in a test environment. The simulation software we used is GAZEBO. The simulation succeed and proofed that this kind of algorithm is applicable and valid.
 
 
   \englishkeywords{modular robot, Control,localization, potential field,GAZEBO}
