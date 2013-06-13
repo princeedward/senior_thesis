@@ -7,32 +7,32 @@
 \begin{abstract}
 本文从模块化机器人与移动机器人的发展现状出发，对于新式的机器人的需求做出了合理的分析，并确定了一种将两种机器人模式进行整合的方案。其兼具有移动机器人的移动能力，同时又可根据用户对于机器人的需求而组合不同的模块以实现需求的功能的灵活性。这样一款智能多模块移动机器人符合现代工业界与特殊应用领域对于机器人的需求。
 
-在确定这款多功能模块化移动机器人的结构后，本文对于控制这一机器人的系统的设计进行了详细的分析与介绍。作为一个完整的系统，其应该包括三个层面上的设计。第一为外在的与环境交互的机器人机械结构，第二为为控制外部结构提供可能的机器人系统电路硬件， 第三为对机器人与外界交互制定规则的控制外部结构的软件。本文从每个部分锁需要的功能出发，对每一个部分都的内容都进行了详细的介绍。
+在确定这款多功能模块化移动机器人的结构后，本文对于控制这一机器人的系统的设计进行了详细的分析与介绍。作为一个完整的系统，其应该包括三个层面上的设计。第一为外在的与环境交互的机器人机械结构，第二为为控制外部结构提供可能的机器人系统电路硬件， 第三为对机器人与外界交互制定规则的控制外部结构的软件。本文从每个部分所需要的功能出发，对每一个部分都的内容都进行了详细的介绍。
 
 机械结构部分，提出了基于以前机器人模块设计方案的诸多改进，其中包括对于通用模块的重设计，对于传感器支架重设计，对于标准通讯接口的重设计，以及对新增加的用于辅助定位的轮式编码器的设计。在设计的说明中，本文给出了最后实现的效果图，同时本设计的尺寸都是以实际尺寸为基础的。
 
-电路硬件部分，进行了多块PCB印刷板的设计。其中硬件电路主要分为两个部分，第一部分为每个模块都要使用的模块基本功能控制电路。其中包括单片机，电源管理，模块间通讯接口。其他未使用的接口全部引出，以供外接模块使用。第二部分为外设辅助电路。其中包括实现各个具体功能的电路，如用于定位的IMU模块，用于测位移和轮速的编码器模块，用于驱动直流电机的电机驱动模块，用于驱动传感器的传感器接口模块和用于实际模块间通讯实现的模块间通讯接口模块。
+电路硬件部分，进行了多块PCB印刷板的设计。其中硬件电路主要分为两个部分，第一部分为每个模块都要使用的基本功能控制电路。其包括单片机，电源管理，模块间通讯接口。其他未使用的接口全部引出，以供外接模块使用。第二部分为外设辅助电路。其中包括实现各个具体功能的电路，如用于定位的IMU模块，用于测位移和轮速的编码器模块，用于驱动直流电机的电机驱动模块，用于驱动传感器的传感器接口模块和用于实际模块间通讯实现的模块间通讯接口模块。
 
 控制软件部分，对控制系统的基本软件单元进行了合理的解释与介绍。这些基本单元包括电机驱动程序，车体定位算法，未知环境蔽障算法和地图绘制与最优路径生成算法。这部分内容依赖大量的数学公式与分析过程。本设计参考了大量相关领域的研究工作，并在此基础上提出了一些新的观点，其中最重要的一点就是改进了虚拟势场算法。
 
-在三部分的设计过后，本设计对所涉及的系统在动力学仿真环境GAZEBO中进行了测试，并通过测试证明所设计的控制软件基本是有效的。关于GAZEBO内测试的具体内容在本文中进行了详细的介绍，并给出了程序，帮助测试过程被更好地理解。
+在三部分的设计过后，本设计对所涉及的系统在动力学仿真环境GAZEBO中进行了测试，并通过测试证明所设计的控制软件基本是有效的。关于GAZEBO内测试的具体内容在本文中进行了详细的介绍，并给出了程序源代码，帮助测试过程被更好地理解。
 
   \keywords{模块化机器人，移动机器人，模块化硬件电路，定位方案，虚拟势场，GAZEBO}
 \end{abstract}
 
 \begin{englishabstract}
+From the state of the art of development of mobile and modular robots, this paper talked about the potential applications and requirements of the new type of robots, and attempt to combine these two concepts together to design a new kind of robot. A robot with moving ability and can be customized by combining different modules will be more attractive and useful.
 
-An imperial edict issued in 1896 by Emperor Guangxu, established Nanyang Public School in Shanghai. The normal school, school of foreign studies, middle school and a high school were established. Sheng Xuanhuai, the person responsible for proposing the idea to the emperor, became the first president and is regarded as the founder of the university.
+After figuring out the structure of this new kind of robot, this paper talked a little bit more about the design process. An independent system should contain three crucial parts. The first of all is the mechanism of the robot which will define how the robot interact with environment. The second one is the circuit that can help the software to control the robot. The last is the software, which is the soul of a system and can be regarded as a set of rules that define the behaviour of the robot. In this paper, it will provide enough details about these three parts.
 
-During the 1930s, the university gained a reputation of nurturing top engineers. After the foundation of People's Republic, some faculties were transferred to other universities. A significant amount of its faculty were sent in 1956, by the national government, to Xi'an to help build up Xi'an Jiao Tong University in western China. Afterwards, the school was officially renamed Shanghai Jiao Tong University.
+For mechanism, the paper shows a lot of re-design of the old modular robot model. For instance, it contains a redesign of module body, a re-design of the sensor stand, a re-design of communication port. There are also some newly designed parts, like an encoder wheel. After each explanation, there will be a rendered image about the real look of those parts.
 
-Since the reform and opening up policy in China, SJTU has taken the lead in management reform of institutions for higher education, regaining its vigor and vitality with an unprecedented momentum of growth. SJTU includes five beautiful campuses, Xuhui, Minhang, Luwan Qibao, and Fahua, taking up an area of about 3,225,833 m2. A number of disciplines have been advancing towards the top echelon internationally, and a batch of burgeoning branches of learning have taken an important position domestically.
+For circuit, the paper provided many PCB design documents, which illustrate the final appearance of a PCB. In this part, there will be two kind of circuit being introduced.The first kind of circuit is a basic one, which contains MCU and communication unit, the other part of circuit are peripherals. The peripherals will help specific module to achieve specific functions.
 
-Today SJTU has 31 schools (departments), 63 undergraduate programs, 250 masters-degree programs, 203 Ph.D. programs, 28 post-doctorate programs, and 11 state key laboratories and national engineering research centers.
+For control software. Most of the software in this paper are written in C, a lot of details in math will be provided. In this part, the paper also propose a new kind of path planing method which is modified virtual potential energy method. 
 
-SJTU boasts a large number of famous scientists and professors, including 35 academics of the Academy of Sciences and Academy of Engineering, 95 accredited professors and chair professors of the "Cheung Kong Scholars Program" and more than 2,000 professors and associate professors.
+In the last part of this paper, it shows the simulation of the robot moving in a test environment. The simulation software we used is GAZEBO. The simulation actually succeed and proofed that this kind of algorithm is applicable and valid.
 
-Its total enrollment of students amounts to 35,929, of which 1,564 are international students. There are 16,802 undergraduates, and 17,563 masters and Ph.D. candidates. After more than a century of operation, Jiao Tong University has inherited the old tradition of "high starting points, solid foundation, strict requirements and extensive practice." Students from SJTU have won top prizes in various competitions, including ACM International Collegiate Programming Contest, International Mathematical Contest in Modeling and Electronics Design Contests. Famous alumni include Jiang Zemin, Lu Dingyi, Ding Guangen, Wang Daohan, Qian Xuesen, Wu Wenjun, Zou Taofen, Mao Yisheng, Cai Er, Huang Yanpei, Shao Lizi, Wang An and many more. More than 200 of the academics of the Chinese Academy of Sciences and Chinese Academy of Engineering are alumni of Jiao Tong University.
 
-  \englishkeywords{\large SJTU, master thesis, XeTeX/LaTeX template}
+  \englishkeywords{modular robot, Control,localization, potential field,GAZEBO}
 \end{englishabstract}
