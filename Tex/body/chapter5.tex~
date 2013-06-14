@@ -334,26 +334,7 @@ namespace gazebo
 在不断对代码修改后，最终仿真得以实现。仿真截图如图所示。其中蓝色部分为传感器前侧所能感知到的区域，图中车体正在向障碍物间空隙前进。因为在仿真中所计算的数据量非常大，所以仿真速度相对较慢，走出迷宫大概花了25小时46分钟。不过最后小车基本顺利到达指定位置，经测试说明在上章中提出的虚拟势场算法基本可行。
 \begin{figure}[!htp]
   \centering
-  %\includegraphics[width=0.8\textwidth]{chap5/OnMoving.jpg}
-	\subfigure[3D模型图]{
-    \label{fig:corereal:a} %% label for first subfigure
-    \includegraphics[width=0.30\textwidth]{chap5/sim1.jpg}}
-  %\hspace{1in}
-  \subfigure[实物图]{
-    \label{fig:corereal:b} %% label for second subfigure
-    \includegraphics[width=0.30\textwidth]{chap5/sim2.jpg}}
-\subfigure[实物图]{
-    \label{fig:corereal:b} %% label for second subfigure
-    \includegraphics[width=0.30\textwidth]{chap5/sim3.jpg}}
-\subfigure[实物图]{
-    \label{fig:corereal:b} %% label for second subfigure
-    \includegraphics[width=0.30\textwidth]{chap5/sim4.jpg}}
-\subfigure[实物图]{
-    \label{fig:corereal:b} %% label for second subfigure
-    \includegraphics[width=0.30\textwidth]{chap5/sim5.jpg}}
-\subfigure[实物图]{
-    \label{fig:corereal:b} %% label for second subfigure
-    \includegraphics[width=0.30\textwidth]{chap5/sim6.jpg}}
+  \includegraphics[width=0.8\textwidth]{chap5/OnMoving.jpg}
   \bicaption[fig.simOnMoving]{仿真进行示意图}{仿真进行示意图}{Fig}{The simulation is on going}
 \end{figure}
 
