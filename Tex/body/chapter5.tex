@@ -8,7 +8,7 @@
 
 \chapter{避障算法的仿真}
 \label{chap:simulation}
-关于移动化机器人底盘系统的设计说明已经在前三章完成，在本章将对于算法的仿真做以详细的介绍。因为机器人的控制算法相对复杂，同时又涉及到在三维空间内的避障，所以一定要先进性动力学仿真，来验证算法的可行性。
+关于移动化机器人底盘系统的设计说明已经在前三章完成，在本章将对于算法的仿真做以详细的介绍。因为机器人的控制算法相对复杂，同时又涉及到在三维空间内的避障，所以一定要先进行动力学仿真，来验证算法的可行性。
 
 \section{仿真软件环境介绍}
 本设计将会使用GAZEBO动力学仿真环境来对在设计中出现的算法进行仿真。Gazebo是一个多机器人仿真环境，目前软件有能力在三维环境中仿真已有的多种机器人，传感器和其他物体。 在仿真环境里，可以模拟生成传感器返回量和根据物理引擎来模拟物体之间的相互作用，其尤为擅长对于刚体物理特性的仿真。GAZEBO具有一种分布式的结构，它的功能被封装在不同的库中，如物理仿真引擎，渲染，UI，通讯和传感器生成。在仿真中将涉及三个不同的部分：物理仿真，传感器生成，GUI界面，最后再加上一个全局坐标管理其。
@@ -331,29 +331,34 @@ namespace gazebo
 \end{lstlisting}
 %\section{传感器的扩展组件}
 \section{仿真过程与算法验证}
-在不断对代码修改后，最终仿真得以实现。仿真截图如图所示。其中蓝色部分为传感器前侧所能感知到的区域，图中车体正在向障碍物间空隙前进。因为在仿真中所计算的数据量非常大，所以仿真速度相对较慢，走出迷宫大概花了25小时46分钟。不过最后小车基本顺利到达指定位置，经测试说明在上章中提出的虚拟势场算法基本可行。
+在不断对代码修改后，最终仿真得以实现。仿真截图如\ref{fig.simOnMoving}图所示。其中蓝色部分为传感器前侧所能感知到的区域。图A中，底盘正向终点方向移动，直至碰到第一个障碍物；图B中，在斥力的作用下越过第一个障碍物，并走到迷宫中；图C为图B的俯视图；图D是底盘模块继续前进，到达第二个障碍物处；图E是其找到障碍物间空隙；图F为通过孔隙；图G为其遇到最后一个障碍物；图H为底盘顺利走出迷宫。因为在仿真中所计算的数据量非常大，所以仿真速度相对较慢，走出迷宫大概花了25小时46分钟。不过最后小车基本顺利到达指定位置，经测试说明在上章中提出的虚拟势场算法基本可行。
 \begin{figure}[!htp]
   \centering
   %\includegraphics[width=0.8\textwidth]{chap5/OnMoving.jpg}
-	\subfigure[3D模型图]{
-    \label{fig:corereal:a} %% label for first subfigure
-    \includegraphics[width=0.30\textwidth]{chap5/sim1.jpg}}
+  \subfigure[A]{
+    \includegraphics[width=0.4\textwidth]{chap5/sim1.jpg}}
   %\hspace{1in}
-  \subfigure[实物图]{
-    \label{fig:corereal:b} %% label for second subfigure
-    \includegraphics[width=0.30\textwidth]{chap5/sim2.jpg}}
-\subfigure[实物图]{
-    \label{fig:corereal:b} %% label for second subfigure
-    \includegraphics[width=0.30\textwidth]{chap5/sim3.jpg}}
-\subfigure[实物图]{
-    \label{fig:corereal:b} %% label for second subfigure
-    \includegraphics[width=0.30\textwidth]{chap5/sim4.jpg}}
-\subfigure[实物图]{
-    \label{fig:corereal:b} %% label for second subfigure
-    \includegraphics[width=0.30\textwidth]{chap5/sim5.jpg}}
-\subfigure[实物图]{
-    \label{fig:corereal:b} %% label for second subfigure
-    \includegraphics[width=0.30\textwidth]{chap5/sim6.jpg}}
+  	\hspace{0.2cm}
+  \subfigure[B]{
+    \includegraphics[width=0.4\textwidth]{chap5/sim2.jpg}}
+	\hspace{0.2cm}
+  \subfigure[C]{
+    \includegraphics[width=0.4\textwidth]{chap5/sim3.jpg}}
+	\hspace{0.2cm}
+  \subfigure[D]{
+    \includegraphics[width=0.4\textwidth]{chap5/sim4.jpg}}
+	\hspace{0.2cm}
+  \subfigure[E]{
+    \includegraphics[width=0.4\textwidth]{chap5/sim5.jpg}}
+	\hspace{0.2cm}
+  \subfigure[F]{
+    \includegraphics[width=0.4\textwidth]{chap5/sim6.jpg}}
+    \hspace{0.2cm}
+  \subfigure[G]{
+    \includegraphics[width=0.4\textwidth]{chap5/sim7.jpg}}
+	\hspace{0.2cm}
+  \subfigure[H]{
+    \includegraphics[width=0.4\textwidth]{chap5/sim8.jpg}}
   \bicaption[fig.simOnMoving]{仿真进行示意图}{仿真进行示意图}{Fig}{The simulation is on going}
 \end{figure}
 

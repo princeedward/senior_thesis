@@ -9,25 +9,21 @@
 对于控制系统的设计，往往也会涉及到机械结构的配套设计。一个控制系统对于机器人控制的实现，是要通过执行器来实现的，因此控制器往往会对执行器的外观有一定的要求；同时控制器决策的确定，是需要传感器辅助来实现的，因此传感器对于所在的机器人本体也会有一定的要求。综上所述，机械结构的设计是控制系统设计的前提。在本章中，会给出和控制系统相关的机械结构的设计细节，以期起到对于后面的控制系统设计的辅助说明。
 
 \section{先前设计方案的回顾}
-<<<<<<< HEAD
-本文所设计的控制系统是以所在实验室先前设计的太阳能驱动模块化机器人作为控制对象原形来进行设计的。所以在对本文所涉及的对于机械结构的改进与重设计之前，对前人的设计方案进行回顾是有必要的。原模块化机器人拼接成的太阳能机器人的3D模型和实物图如图\ref{fig.OriginalModel} 所示。 \\
-=======
 本文所设计的控制系统是以所在实验室先前设计的太阳能驱动模块化机器人作为控制对象原形来进行设计的。原模块化机器人拼接成的太阳能机器人的3D模型和实物图如图\ref{fig.OriginalModel} 所示。 \\
->>>>>>> 344532f7f0d9415fa34ed575a4c3b19c275e0e14
 \begin{figure}
   \centering
   \subfigure[3D模型图]{
-    \label{fig:corereal:a} %% label for first subfigure
+    \label{fig.OriginalModel:a} %% label for first subfigure
     \includegraphics[width=0.35\textwidth]{chap2/Original3DModel.png}}
   \hspace{1in}
   \subfigure[实物图]{
-    \label{fig:corereal:b} %% label for second subfigure
+    \label{fig.OriginalModel:b} %% label for second subfigure
     \includegraphics[width=0.35\textwidth]{chap2/OriginalRealModel.PNG}}
   \bicaption[fig.OriginalModel]{原设计方案模型}{原设计方案模型}{Fig}{The Model of the Original Design}
 \end{figure}
 原机器人的坐标系规定如下：
 
-原点O取为移动模块两驱动轮中心连线的中点，Z轴垂直机器人底面向上，Y轴沿机器人前进方向，X轴由右手定则确定。太阳能驱动模块化机器人结构与坐标方向示意如图\ref{fig:corereal:a} 所示。
+原点O取为移动模块两驱动轮中心连线的中点，Z轴垂直机器人底面向上，Y轴沿机器人前进方向，X轴由右手定则确定。太阳能驱动模块化机器人结构与坐标方向示意如图\ref{fig.OriginalModel:a} 所示。
 \subsection{传感器模块结构}
 传感模块主体为立方壳体，模块上、下表面分别安装上、下接口。两侧分别固定一个支架，再在支架上固定一个圆环，在圆环的前、后、左、右及左前、右前、左后、右后的八等分圆处分别安装一个超声波传感器。主要用于实现对八个方位的障碍物探测与测距功能。如图\ref{fig.SensorSupport} 所示。
 \begin{figure}[!htp]

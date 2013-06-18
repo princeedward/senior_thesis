@@ -28,8 +28,8 @@
 \end{figure}
 \begin{figure}[!htp]
   \centering
+  \includegraphics[angle=-90,width=0.8\textwidth]{chap3/CoreBoard.PNG}
   \bicaption[fig.CoreSch]{最小系统电路图}{最小系统电路图}{Fig}{Schematic of the Minimal Core System}
-  \includegraphics[angle=-90,width=1.3\textwidth]{chap3/Core112V2.pdf}
 \end{figure}
 
 这块最小系统板上有一个16MHz的晶振连接至芯片。芯片正常工作时的频率是由锁相环（PLL）超频到40MHz的。这块最小系统还有一个复位键，引入芯片RESET引脚，将检测电路的下降沿进行复位。同时最小系统上还提供一个BWM程序上传和下载及在线调试模块。片上提供128k片上RAM，可以用来储存芯片执行用程序。还有一个独立的电源管理模块，以提供稳定的5v电压给单片机工作。之所以称为最小系统，就是因为以上是这块芯片的全部功能元件。如原理图所示，这块最小系统的其他功能就是简单的将单片机所有引脚引出。 
@@ -38,8 +38,9 @@
 功能接口板是通用模块控制电路的核心部分。它具有承上启下的作用，得到最小系统引出的单片机全部空余引脚，并对其功能进行设计。其电路图如图\ref{fig.BaseSch} 所示。 其共分为电源管理，CAN总线，单片机接口，电压测试单元，串口通讯，数码管显示单元，LED及案件阵列和引出接口几部分。 
 \begin{figure}[!htp]
   \centering
-  \bicaption[fig.BaseSch]{功能接口板电路图}{功能接口板电路图}{Fig}{Schematic of Base Board}
+  %\bicaption[fig.BaseSch]{功能接口板电路图}{功能接口板电路图}{Fig}{Schematic of Base Board}
   \includegraphics[angle=-90,width=0.8\textwidth]{chap3/CoreBoardSchematic.PNG}
+  \bicaption[fig.BaseSch]{功能接口板电路图}{功能接口板电路图}{Fig}{Schematic of Base Board}
 \end{figure}
 
 
@@ -172,7 +173,7 @@ IMU是Inertial measurement unit（惯性测量单元）的缩写。本方案所�
 \subsection{模块间通讯接口}
 模块间通讯接口是本设计中很重要的一部分，也是本设计的一个创新点。在Ying Zhang\upcite{zhang2002massively} 的关于模块化机器人的大规模控制网络系统设计中,提供了使用CAN总线的模块化机器人网络进行控制的很好的解决方案。这套方案给出了一个在软件层面上可行的方法，受此启发，本设计将整个模块化机器人的相互通讯架构在CAN总线上。在前面的机械设计部分，对于为何使用光学式通道连接代替机械式触点连接给出了充分的解释。而在本章这是在电路硬件层面上将其实现。
 
-对于CAN总线的每一条输出线都采用一对红外线光电对管来发送和接受相应线中的内容。CANH中是以2.5V为基电位的脉冲信号，最大幅值为5v；而CANL中是以0V为基电位的脉冲信号，最大幅值为2.5V。根据其这一特点，分别设计了CANH和CANL的发送单元。对于CANH是先将信号通过减法器，减去一个2.5V的参考电压，再输出到一个MOSFET的G极，控制红外LED的开关，来达到把信号发出的目的。CANL则可以直接减引脚接入MOSFET的G极来控制红外LED的亮灭。CANH和CANL的接收单元也不相同。因为接收到的光敏二极管的输出电压为一模拟值，所以要通过一定的方法把其变为数字值。对于CANH，输出电压先经过一个比较器，变为基值是0v，幅值是5V的脉冲信号，再通过加法器加上一个2.5V的参考电压，来变成基值为2.5V，最大幅值为5V的脉冲信号，并输出回CANH线。对于CANL线，情况相似，也是要先要经过一个比较器，在对脉冲信号进行调幅。这一模块的原理图如图所示，PCB设计样图如图所示，虚拟实物图如图所示。
+对于CAN总线的每一条输出线都采用一对红外线光电对管来发送和接受相应线中的内容。CANH中是以2.5V为基电位的脉冲信号，最大幅值为5v；而CANL中是以0V为基电位的脉冲信号，最大幅值为2.5V。根据其这一特点，分别设计了CANH和CANL的发送单元。对于CANH是先将信号通过减法器，减去一个2.5V的参考电压，再输出到一个MOSFET的G极，控制红外LED的开关，来达到把信号发出的目的。CANL则可以直接减引脚接入MOSFET的G极来控制红外LED的亮灭。CANH和CANL的接收单元也不相同。因为接收到的光敏二极管的输出电压为一模拟值，所以要通过一定的方法把其变为数字值。对于CANH，输出电压先经过一个比较器，变为基值是0v，幅值是5V的脉冲信号，再通过加法器加上一个2.5V的参考电压，来变成基值为2.5V，最大幅值为5V的脉冲信号，并输出回CANH线。对于CANL线，情况相似，也是要先要经过一个比较器，在对脉冲信号进行调幅。这一模块的原理图如图所示，PCB设计样图如图\ref{fig.CANPPCB}所示，虚拟实物图如图\ref{fig.CANPReal}所示。
 \begin{figure}[!htp]
   \centering
   \includegraphics[angle=-90,width=0.8\textwidth]{chap3/CANCommunication.PNG}
